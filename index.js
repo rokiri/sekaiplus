@@ -6,16 +6,23 @@ const UPSTREAM = 'https://sonolus.sekai.best'
 const PORT = process.env.PORT || 3000
 const app = express()
 
-// Serve engine files
 app.use('/engine', express.static('./engine'))
 
-// Helper hash file
 const hashFile = (path) => {
     const buf = readFileSync(path)
     return createHash('sha1').update(buf).digest('hex')
 }
 
-// 1. Intercept engine next-sekai
+// 1. Server info
+app.get('/sonolus/info', async (req, res) => {
+    const response = await fetch(`${UPSTREAM}/sonolus/info`)
+    const data = await response.json()
+    data.title = 'SekaiPlus'
+    data.description = 'Project Sekai engine powered by SekaiPlus'
+    res.json(data)
+})
+
+// 2. Intercept engine next-sekai
 app.get('/sonolus/engines/next-sekai', async (req, res) => {
     const base = `https://${req.get('host')}`
     res.json({
@@ -42,7 +49,28 @@ app.get('/sonolus/engines/next-sekai', async (req, res) => {
     })
 })
 
-// 2. Proxy level data (binary)
+// 3. Intercept level list - hapus source engine
+app.get('/sonolus/levels/list', async (req, res) => {
+    const qs = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''
+    const url = `${UPSTREAM}/sonolus/levels/list${qs}`
+    const response = await fetch(url)
+    const data = await response.json()
+    for (const item of data.items) {
+        if (item.engine) item.engine.source = ''
+    }
+    res.json(data)
+})
+
+// 4. Intercept level detail - hapus source engine
+app.get('/sonolus/levels/:name', async (req, res) => {
+    const url = `${UPSTREAM}/sonolus/levels/${req.params.name}`
+    const response = await fetch(url)
+    const data = await response.json()
+    if (data.item?.engine) data.item.engine.source = ''
+    res.json(data)
+})
+
+// 5. Proxy level data (binary)
 app.get('/sonolus/levels/:name/data', async (req, res) => {
     const qs = req.url.includes('?') ? '?' + req.url.split('?')[1] : ''
     const url = `${UPSTREAM}/sonolus/levels/${req.params.name}/data${qs}`
@@ -53,7 +81,7 @@ app.get('/sonolus/levels/:name/data', async (req, res) => {
     res.send(Buffer.from(buffer))
 })
 
-// 3. Proxy repository (binary)
+// 6. Proxy repository (binary)
 app.use('/sonolus/repository', async (req, res) => {
     const url = `${UPSTREAM}/sonolus/repository${req.path}`
     const response = await fetch(url)
@@ -63,17 +91,7 @@ app.use('/sonolus/repository', async (req, res) => {
     res.send(Buffer.from(buffer))
 })
 
-// Intercept server info
-app.get('/sonolus/info', async (req, res) => {
-    const response = await fetch(`${UPSTREAM}/sonolus/info`)
-    const data = await response.json()
-    data.title = 'SekaiPlus'
-    data.description = 'Project Sekai engine powered by SekaiPlus'
-    res.json(data)
-})
-
-
-// 4. Proxy semua request lain ke sekai.best
+// 7. Proxy semua request lain
 app.use('/sonolus', async (req, res) => {
     const qs = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''
     const url = `${UPSTREAM}/sonolus${req.path}${qs}`
