@@ -22,9 +22,9 @@ app.get('/sonolus/engines/next-sekai', async (req, res) => {
         item: {
             name: 'next-sekai',
             version: 13,
-            title: { en: 'Project Sekai' },
+            title: { en: 'SekaiPlus' },
             subtitle: { en: 'Project Sekai: Colorful Stage!' },
-            author: { en: 'Burrito + Nanashi' },
+            author: { en: 'SekaiPlus' },
             tags: [],
             skin: 'next-sekai-01',
             background: 'next-sekai',
