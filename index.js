@@ -4,7 +4,6 @@ import { createHash } from 'crypto'
 
 const UPSTREAM = 'https://sonolus.sekai.best'
 const PORT = process.env.PORT || 3000
-
 const app = express()
 
 // Serve engine files
@@ -16,21 +15,21 @@ const hashFile = (path) => {
     return createHash('sha1').update(buf).digest('hex')
 }
 
-// Intercept engine detail pjsekai
-app.get('/sonolus/engines/pjsekai', async (req, res) => {
-    const base = `${req.protocol}://${req.get('host')}`
+// 1. Intercept engine next-sekai
+app.get('/sonolus/engines/next-sekai', async (req, res) => {
+    const base = `https://${req.get('host')}`
     res.json({
         item: {
-            name: 'pjsekai',
+            name: 'next-sekai',
             version: 13,
             title: { en: 'Project Sekai' },
             subtitle: { en: 'Project Sekai: Colorful Stage!' },
             author: { en: 'Burrito + Nanashi' },
             tags: [],
-            skin: '',
-            background: '',
-            effect: '',
-            particle: '',
+            skin: 'next-sekai-01',
+            background: 'next-sekai',
+            effect: 'next-sekai-01',
+            particle: 'next-sekai',
             thumbnail: { hash: hashFile('./engine/thumbnail.png'), url: `${base}/engine/thumbnail.png` },
             playData: { hash: hashFile('./engine/EnginePlayData'), url: `${base}/engine/EnginePlayData` },
             watchData: { hash: hashFile('./engine/EngineWatchData'), url: `${base}/engine/EngineWatchData` },
@@ -43,19 +42,10 @@ app.get('/sonolus/engines/pjsekai', async (req, res) => {
     })
 })
 
-// Proxy semua request lain ke sekai.best
-app.use('/sonolus', async (req, res) => {
-    const url = `${UPSTREAM}/sonolus${req.path}${req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''}`
-    const response = await fetch(url)
-    const data = await response.text()
-    res.status(response.status)
-    res.set('Content-Type', response.headers.get('Content-Type'))
-    res.send(data)
-})
-
-// Proxy level data
+// 2. Proxy level data (binary)
 app.get('/sonolus/levels/:name/data', async (req, res) => {
-    const url = `${UPSTREAM}/sonolus/levels/${req.params.name}/data${req.url.includes('?') ? '?' + req.url.split('?')[1] : ''}`
+    const qs = req.url.includes('?') ? '?' + req.url.split('?')[1] : ''
+    const url = `${UPSTREAM}/sonolus/levels/${req.params.name}/data${qs}`
     const response = await fetch(url)
     const buffer = await response.arrayBuffer()
     res.status(response.status)
@@ -63,9 +53,20 @@ app.get('/sonolus/levels/:name/data', async (req, res) => {
     res.send(Buffer.from(buffer))
 })
 
-// Proxy semua request lain ke sekai.best
+// 3. Proxy repository (binary)
+app.use('/sonolus/repository', async (req, res) => {
+    const url = `${UPSTREAM}/sonolus/repository${req.path}`
+    const response = await fetch(url)
+    const buffer = await response.arrayBuffer()
+    res.status(response.status)
+    res.set('Content-Type', response.headers.get('Content-Type') || 'application/octet-stream')
+    res.send(Buffer.from(buffer))
+})
+
+// 4. Proxy semua request lain ke sekai.best
 app.use('/sonolus', async (req, res) => {
-    const url = `${UPSTREAM}/sonolus${req.path}${req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''}`
+    const qs = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''
+    const url = `${UPSTREAM}/sonolus${req.path}${qs}`
     const response = await fetch(url)
     const data = await response.text()
     res.status(response.status)
