@@ -45,13 +45,14 @@ app.get('/sonolus/engines/next-sekai', async (req, res) => {
 
 // Proxy semua request lain ke sekai.best
 app.set('trust proxy', true)
-app.use('/sonolus', async (req, res) => {
-    const url = `${UPSTREAM}/sonolus${req.path}${req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''}`
+// Proxy repository files ke sekai.best
+app.use('/sonolus/repository', async (req, res) => {
+    const url = `${UPSTREAM}/sonolus/repository${req.path}`
     const response = await fetch(url)
-    const data = await response.text()
+    const buffer = await response.arrayBuffer()
     res.status(response.status)
-    res.set('Content-Type', response.headers.get('Content-Type'))
-    res.send(data)
+    res.set('Content-Type', response.headers.get('Content-Type') || 'application/octet-stream')
+    res.send(Buffer.from(buffer))
 })
 
 app.listen(PORT, () => {
