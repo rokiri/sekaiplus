@@ -53,6 +53,16 @@ app.use('/sonolus', async (req, res) => {
     res.send(data)
 })
 
+// Proxy level data
+app.get('/sonolus/levels/:name/data', async (req, res) => {
+    const url = `${UPSTREAM}/sonolus/levels/${req.params.name}/data${req.url.includes('?') ? '?' + req.url.split('?')[1] : ''}`
+    const response = await fetch(url)
+    const buffer = await response.arrayBuffer()
+    res.status(response.status)
+    res.set('Content-Type', response.headers.get('Content-Type') || 'application/octet-stream')
+    res.send(Buffer.from(buffer))
+})
+
 // Proxy semua request lain ke sekai.best
 app.use('/sonolus', async (req, res) => {
     const url = `${UPSTREAM}/sonolus${req.path}${req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''}`
