@@ -18,7 +18,7 @@ const hashFile = (path) => {
 
 // Intercept engine detail pjsekai
 app.get('/sonolus/engines/pjsekai', async (req, res) => {
-    const base = `${req.protocol}://${req.get('host')}`
+    const base = `https://${req.get('host')}`
     res.json({
         item: {
             name: 'pjsekai',
