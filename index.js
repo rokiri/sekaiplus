@@ -17,20 +17,20 @@ const hashFile = (path) => {
 }
 
 // Intercept engine detail pjsekai
-app.get('/sonolus/engines/next-sekai', async (req, res) => {
-    const base = `https://${req.get('host')}`
+app.get('/sonolus/engines/pjsekai', async (req, res) => {
+    const base = `${req.protocol}://${req.get('host')}`
     res.json({
         item: {
-            name: 'next-sekai',
+            name: 'pjsekai',
             version: 13,
             title: { en: 'Project Sekai' },
             subtitle: { en: 'Project Sekai: Colorful Stage!' },
             author: { en: 'Burrito + Nanashi' },
             tags: [],
-            skin: 'next-sekai-01',
-            background: 'next-sekai',
-            effect: 'next-sekai-01',
-            particle: 'next-sekai',
+            skin: '',
+            background: '',
+            effect: '',
+            particle: '',
             thumbnail: { hash: hashFile('./engine/thumbnail.png'), url: `${base}/engine/thumbnail.png` },
             playData: { hash: hashFile('./engine/EnginePlayData'), url: `${base}/engine/EnginePlayData` },
             watchData: { hash: hashFile('./engine/EngineWatchData'), url: `${base}/engine/EngineWatchData` },
@@ -44,15 +44,23 @@ app.get('/sonolus/engines/next-sekai', async (req, res) => {
 })
 
 // Proxy semua request lain ke sekai.best
-app.set('trust proxy', true)
-// Proxy repository files ke sekai.best
-app.use('/sonolus/repository', async (req, res) => {
-    const url = `${UPSTREAM}/sonolus/repository${req.path}`
+app.use('/sonolus', async (req, res) => {
+    const url = `${UPSTREAM}/sonolus${req.path}${req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''}`
     const response = await fetch(url)
-    const buffer = await response.arrayBuffer()
+    const data = await response.text()
     res.status(response.status)
-    res.set('Content-Type', response.headers.get('Content-Type') || 'application/octet-stream')
-    res.send(Buffer.from(buffer))
+    res.set('Content-Type', response.headers.get('Content-Type'))
+    res.send(data)
+})
+
+// Proxy semua request lain ke sekai.best
+app.use('/sonolus', async (req, res) => {
+    const url = `${UPSTREAM}/sonolus${req.path}${req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''}`
+    const response = await fetch(url)
+    const data = await response.text()
+    res.status(response.status)
+    res.set('Content-Type', response.headers.get('Content-Type'))
+    res.send(data)
 })
 
 app.listen(PORT, () => {
