@@ -44,6 +44,7 @@ app.get('/sonolus/engines/pjsekai', async (req, res) => {
 })
 
 // Proxy semua request lain ke sekai.best
+app.set('trust proxy', true)
 app.use('/sonolus', async (req, res) => {
     const url = `${UPSTREAM}/sonolus${req.path}${req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''}`
     const response = await fetch(url)
