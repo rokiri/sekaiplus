@@ -63,6 +63,16 @@ app.use('/sonolus/repository', async (req, res) => {
     res.send(Buffer.from(buffer))
 })
 
+// Intercept server info
+app.get('/sonolus/info', async (req, res) => {
+    const response = await fetch(`${UPSTREAM}/sonolus/info`)
+    const data = await response.json()
+    data.title = 'SekaiPlus'
+    data.description = 'Project Sekai engine powered by SekaiPlus'
+    res.json(data)
+})
+
+
 // 4. Proxy semua request lain ke sekai.best
 app.use('/sonolus', async (req, res) => {
     const qs = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''
