@@ -1,0 +1,33 @@
+{
+    "info": {
+        "title": {"en": "My Sonolus Server"}
+    },
+    "posts": [],
+    "playlists": [],
+    "levels": [],
+    "skins": [],
+    "backgrounds": [],
+    "effects": [],
+    "particles": [],
+    "engines": [
+        {
+            "name": "pjsekai",
+            "version": 13,
+            "title": {"en": "Project Sekai"},
+            "subtitle": {"en": "Project Sekai: Colorful Stage!"},
+            "author": {"en": "Burrito"},
+            "tags": [],
+            "skin": {"name": "", "version": 0, "title": {"en": ""}, "subtitle": {"en": ""}, "author": {"en": ""}, "tags": [], "thumbnail": {}, "data": {}, "texture": {}},
+            "background": {"name": "", "version": 0, "title": {"en": ""}, "subtitle": {"en": ""}, "author": {"en": ""}, "tags": [], "thumbnail": {}, "data": {}, "image": {}, "configuration": {}},
+            "effect": {"name": "", "version": 0, "title": {"en": ""}, "subtitle": {"en": ""}, "author": {"en": ""}, "tags": [], "thumbnail": {}, "data": {}},
+            "particle": {"name": "", "version": 0, "title": {"en": ""}, "subtitle": {"en": ""}, "author": {"en": ""}, "tags": [], "thumbnail": {}, "data": {}, "texture": {}},
+            "thumbnail": {"hash": null, "url": "repository/thumbnail.png"},
+            "playData": {"hash": null, "url": "repository/EnginePlayData"},
+            "watchData": {"hash": null, "url": "repository/EngineWatchData"},
+            "previewData": {"hash": null, "url": "repository/EnginePreviewData"},
+            "tutorialData": {"hash": null, "url": "repository/EngineTutorialData"},
+            "configuration": {"hash": null, "url": "repository/EngineConfiguration"}
+        }
+    ],
+    "replays": []
+}
