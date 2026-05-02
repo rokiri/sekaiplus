@@ -13,6 +13,19 @@ const hashFile = (path) => {
     return createHash('sha1').update(buf).digest('hex')
 }
 
+const fixEngine = (engine, base) => {
+    if (!engine) return
+    engine.source = ''
+    engine.name = 'sekaiplus'
+    engine.title = 'SekaiPlus'
+    engine.playData = { hash: hashFile('./engine/EnginePlayData'), url: `${base}/engine/EnginePlayData` }
+    engine.watchData = { hash: hashFile('./engine/EngineWatchData'), url: `${base}/engine/EngineWatchData` }
+    engine.previewData = { hash: hashFile('./engine/EnginePreviewData'), url: `${base}/engine/EnginePreviewData` }
+    engine.tutorialData = { hash: hashFile('./engine/EngineTutorialData'), url: `${base}/engine/EngineTutorialData` }
+    engine.configuration = { hash: hashFile('./engine/EngineConfiguration'), url: `${base}/engine/EngineConfiguration` }
+    engine.thumbnail = { hash: hashFile('./engine/thumbnail.png'), url: `${base}/engine/thumbnail.png` }
+}
+
 // 1. Server info
 app.get('/sonolus/info', async (req, res) => {
     const response = await fetch(`${UPSTREAM}/sonolus/info`)
@@ -22,65 +35,38 @@ app.get('/sonolus/info', async (req, res) => {
     res.json(data)
 })
 
-// 2. Intercept engine next-sekai
-app.get('/sonolus/engines/next-sekai', async (req, res) => {
+// 2. Intercept engine sekaiplus
+app.get('/sonolus/engines/sekaiplus', async (req, res) => {
     const base = `https://${req.get('host')}`
-    res.json({
-        item: {
-            name: 'next-sekai',
-            version: 13,
-            title: { en: 'SekaiPlus' },
-            subtitle: { en: 'Project Sekai: Colorful Stage!' },
-            author: { en: 'SekaiPlus' },
-            tags: [],
-            skin: 'next-sekai-01',
-            background: 'next-sekai',
-            effect: 'next-sekai-01',
-            particle: 'next-sekai',
-            thumbnail: { hash: hashFile('./engine/thumbnail.png'), url: `${base}/engine/thumbnail.png` },
-            playData: { hash: hashFile('./engine/EnginePlayData'), url: `${base}/engine/EnginePlayData` },
-            watchData: { hash: hashFile('./engine/EngineWatchData'), url: `${base}/engine/EngineWatchData` },
-            previewData: { hash: hashFile('./engine/EnginePreviewData'), url: `${base}/engine/EnginePreviewData` },
-            tutorialData: { hash: hashFile('./engine/EngineTutorialData'), url: `${base}/engine/EngineTutorialData` },
-            configuration: { hash: hashFile('./engine/EngineConfiguration'), url: `${base}/engine/EngineConfiguration` },
-        },
-        description: '',
-        recommended: []
-    })
+    const upstream = await fetch(`${UPSTREAM}/sonolus/engines/next-sekai`)
+    const data = await upstream.json()
+    fixEngine(data.item, base)
+    res.json(data)
 })
 
-// 3. Intercept level list - hapus source engine
+// 3. Intercept level list
 app.get('/sonolus/levels/list', async (req, res) => {
     const qs = req.url.includes('?') ? req.url.substring(req.url.indexOf('?')) : ''
     const url = `${UPSTREAM}/sonolus/levels/list${qs}`
     const response = await fetch(url)
     const data = await response.json()
-    for (const item of data.items) {
-        if (item.engine) item.engine.source = ''
-    }
+    const base = `https://${req.get('host')}`
+    for (const item of data.items) fixEngine(item.engine, base)
     res.json(data)
 })
 
-// 4. Intercept level detail - hapus source engine semua
+// 4. Intercept level detail
 app.get('/sonolus/levels/:name', async (req, res) => {
     const url = `${UPSTREAM}/sonolus/levels/${req.params.name}`
     const response = await fetch(url)
     const data = await response.json()
-    
-    // Hapus source di level utama
-    if (data.item?.engine) data.item.engine.source = ''
-    
-    // Hapus source di semua sections
+    const base = `https://${req.get('host')}`
+    fixEngine(data.item?.engine, base)
     if (data.sections) {
         for (const section of data.sections) {
-            if (section.items) {
-                for (const item of section.items) {
-                    if (item.engine) item.engine.source = ''
-                }
-            }
+            for (const item of section.items || []) fixEngine(item.engine, base)
         }
     }
-    
     res.json(data)
 })
 
