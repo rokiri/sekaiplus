@@ -17,20 +17,20 @@ const hashFile = (path) => {
 }
 
 // Intercept engine detail pjsekai
-app.get('/sonolus/engines/pjsekai', async (req, res) => {
+app.get('/sonolus/engines/next-sekai', async (req, res) => {
     const base = `https://${req.get('host')}`
     res.json({
         item: {
-            name: 'pjsekai',
+            name: 'next-sekai',
             version: 13,
             title: { en: 'Project Sekai' },
             subtitle: { en: 'Project Sekai: Colorful Stage!' },
             author: { en: 'Burrito + Nanashi' },
             tags: [],
-            skin: '',
-            background: '',
-            effect: '',
-            particle: '',
+            skin: 'next-sekai-01',
+            background: 'next-sekai',
+            effect: 'next-sekai-01',
+            particle: 'next-sekai',
             thumbnail: { hash: hashFile('./engine/thumbnail.png'), url: `${base}/engine/thumbnail.png` },
             playData: { hash: hashFile('./engine/EnginePlayData'), url: `${base}/engine/EnginePlayData` },
             watchData: { hash: hashFile('./engine/EngineWatchData'), url: `${base}/engine/EngineWatchData` },
