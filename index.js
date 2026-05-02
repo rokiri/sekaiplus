@@ -61,12 +61,26 @@ app.get('/sonolus/levels/list', async (req, res) => {
     res.json(data)
 })
 
-// 4. Intercept level detail - hapus source engine
+// 4. Intercept level detail - hapus source engine semua
 app.get('/sonolus/levels/:name', async (req, res) => {
     const url = `${UPSTREAM}/sonolus/levels/${req.params.name}`
     const response = await fetch(url)
     const data = await response.json()
+    
+    // Hapus source di level utama
     if (data.item?.engine) data.item.engine.source = ''
+    
+    // Hapus source di semua sections
+    if (data.sections) {
+        for (const section of data.sections) {
+            if (section.items) {
+                for (const item of section.items) {
+                    if (item.engine) item.engine.source = ''
+                }
+            }
+        }
+    }
+    
     res.json(data)
 })
 
