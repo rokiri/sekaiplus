@@ -70,7 +70,7 @@ app.get('/sonolus/levels/:name', async (req, res) => {
     res.json(data)
 })
 
-// 5. Proxy level data (binary)
+// 5. Proxy level data (binary) - tanpa converter
 app.get('/sonolus/levels/:name/data', async (req, res) => {
     const qs = req.url.includes('?') ? '?' + req.url.split('?')[1] : ''
     const url = `${UPSTREAM}/sonolus/levels/${req.params.name}/data${qs}`
@@ -80,7 +80,6 @@ app.get('/sonolus/levels/:name/data', async (req, res) => {
     res.set('Content-Type', response.headers.get('Content-Type') || 'application/octet-stream')
     res.send(Buffer.from(buffer))
 })
-
 // 6. Proxy repository (binary)
 app.use('/sonolus/repository', async (req, res) => {
     const url = `${UPSTREAM}/sonolus/repository${req.path}`
