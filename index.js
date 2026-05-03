@@ -18,6 +18,8 @@ const fixEngine = (engine, base) => {
     engine.source = ''
     engine.name = 'sekaiplus'
     engine.title = 'SekaiPlus'
+    // Biarkan skin/background/effect/particle dari sekai.best
+    // hanya ganti engine data files
     engine.playData = { hash: hashFile('./engine/EnginePlayData'), url: `${base}/engine/EnginePlayData` }
     engine.watchData = { hash: hashFile('./engine/EngineWatchData'), url: `${base}/engine/EngineWatchData` }
     engine.previewData = { hash: hashFile('./engine/EnginePreviewData'), url: `${base}/engine/EnginePreviewData` }
