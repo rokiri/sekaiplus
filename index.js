@@ -18,14 +18,7 @@ const fixEngine = (engine, base) => {
     engine.source = ''
     engine.name = 'sekaiplus'
     engine.title = 'SekaiPlus'
-    // Biarkan skin/background/effect/particle dari sekai.best
-    // hanya ganti engine data files
-    engine.playData = { hash: hashFile('./engine/EnginePlayData'), url: `${base}/engine/EnginePlayData` }
-    engine.watchData = { hash: hashFile('./engine/EngineWatchData'), url: `${base}/engine/EngineWatchData` }
-    engine.previewData = { hash: hashFile('./engine/EnginePreviewData'), url: `${base}/engine/EnginePreviewData` }
-    engine.tutorialData = { hash: hashFile('./engine/EngineTutorialData'), url: `${base}/engine/EngineTutorialData` }
-    engine.configuration = { hash: hashFile('./engine/EngineConfiguration'), url: `${base}/engine/EngineConfiguration` }
-    engine.thumbnail = { hash: hashFile('./engine/thumbnail.png'), url: `${base}/engine/thumbnail.png` }
+    // Tidak ganti engine files - biarkan dari sekai.best
 }
 
 // 1. Server info
@@ -39,10 +32,11 @@ app.get('/sonolus/info', async (req, res) => {
 
 // 2. Intercept engine sekaiplus
 app.get('/sonolus/engines/sekaiplus', async (req, res) => {
-    const base = `https://${req.get('host')}`
-    const upstream = await fetch(`${UPSTREAM}/sonolus/engines/next-sekai`)
-    const data = await upstream.json()
-    fixEngine(data.item, base)
+    const response = await fetch(`${UPSTREAM}/sonolus/engines/next-sekai`)
+    const data = await response.json()
+    data.item.source = ''
+    data.item.name = 'sekaiplus'
+    data.item.title = 'SekaiPlus'
     res.json(data)
 })
 
